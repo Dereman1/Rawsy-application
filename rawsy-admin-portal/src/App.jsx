@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
+import UserManagement from './components/UserManagement';
 import './App.css';
 
 function App() {
@@ -57,10 +58,7 @@ function App() {
         </div>
       </header>
       <main className="app-main">
-        <div className="welcome-section">
-          <h2>Welcome to Rawsy Admin Portal</h2>
-          <p>Manage your B2B marketplace platform</p>
-        </div>
+        <UserManagement />
       </main>
     </div>
   );
