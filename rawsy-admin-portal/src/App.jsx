@@ -82,12 +82,19 @@ function App() {
         >
           Platform Analytics
         </button>
+        <button
+          className={`nav-tab ${activeTab === 'support' ? 'active' : ''}`}
+          onClick={() => setActiveTab('support')}
+        >
+          Help & Support System
+        </button>
       </nav>
 
       <main className="app-main">
         {activeTab === 'users' && <UserManagement />}
         {activeTab === 'products' && <ProductModeration />}
         {activeTab === 'analytics' && <PlatformAnalytics />}
+        {activeTab === 'support' && <div className="welcome-section"><h2>Help & Support System</h2><p>Support management features will be available here.</p></div>}
       </main>
     </div>
   );
