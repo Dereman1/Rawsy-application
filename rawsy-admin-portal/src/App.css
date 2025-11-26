@@ -9,11 +9,73 @@
   color: white;
   padding: 1.5rem 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .app-header h1 {
   font-size: 1.75rem;
   font-weight: 600;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.user-info {
+  font-size: 0.95rem;
+}
+
+.logout-button {
+  padding: 0.5rem 1rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.app-nav {
+  background-color: #f3f4f6;
+  border-bottom: 2px solid #e5e7eb;
+  display: flex;
+  gap: 0;
+}
+
+.nav-tab {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  background-color: transparent;
+  color: #6b7280;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+  text-align: left;
+}
+
+.nav-tab:hover {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.nav-tab.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+  background-color: white;
 }
 
 .app-main {

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import UserManagement from './components/UserManagement';
+import ProductModeration from './components/ProductModeration';
 import './App.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminUser, setAdminUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('users');
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -57,8 +59,23 @@ function App() {
           </button>
         </div>
       </header>
+      <nav className="app-nav">
+        <button
+          className={`nav-tab ${activeTab === 'users' ? 'active' : ''}`}
+          onClick={() => setActiveTab('users')}
+        >
+          User Management
+        </button>
+        <button
+          className={`nav-tab ${activeTab === 'products' ? 'active' : ''}`}
+          onClick={() => setActiveTab('products')}
+        >
+          Product Moderation
+        </button>
+      </nav>
       <main className="app-main">
-        <UserManagement />
+        {activeTab === 'users' && <UserManagement />}
+        {activeTab === 'products' && <ProductModeration />}
       </main>
     </div>
   );
