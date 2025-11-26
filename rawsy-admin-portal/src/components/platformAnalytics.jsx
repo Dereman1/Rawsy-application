@@ -27,18 +27,39 @@ function PlatformAnalytics() {
       setError("");
       const token = localStorage.getItem("authToken");
 
-      const response = await fetch("http://localhost:4000/api/admin/analytics", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const [overviewRes, suppliersRes, productsRes, trendsRes] = await Promise.all([
+        fetch("http://localhost:4000/api/admin/metrics/overview", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch("http://localhost:4000/api/admin/metrics/top-suppliers?limit=5", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch("http://localhost:4000/api/admin/metrics/top-products?limit=5", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch("http://localhost:4000/api/admin/metrics/trends?months=6", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
 
-      if (!response.ok) {
+      if (!overviewRes.ok || !suppliersRes.ok || !productsRes.ok || !trendsRes.ok) {
         throw new Error("Failed to fetch analytics");
       }
 
-      const data = await response.json();
-      setStats(data);
+      const [overview, suppliers, products, trends] = await Promise.all([
+        overviewRes.json(),
+        suppliersRes.json(),
+        productsRes.json(),
+        trendsRes.json(),
+      ]);
+
+      setStats({
+        ...overview.overview,
+        topSuppliers: suppliers.topSuppliers,
+        topProducts: products.topByOrders,
+        revenueChart: trends.revenueChart,
+        ordersChart: trends.ordersChart,
+      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -75,57 +96,112 @@ function PlatformAnalytics() {
           {/* Stats Summary */}
           <div className="analytics-stats-grid">
             <div className="analytics-card">
-              <h4>Total Users</h4>
-              <p>{stats.totalUsers}</p>
+              <h4>Total Manufacturers</h4>
+              <p>{stats.totalManufacturers || 0}</p>
             </div>
 
             <div className="analytics-card">
-              <h4>Active Users</h4>
-              <p>{stats.activeUsers}</p>
+              <h4>Active Suppliers</h4>
+              <p>{stats.activeSuppliers || 0}</p>
             </div>
 
             <div className="analytics-card">
-              <h4>Suspended Users</h4>
-              <p>{stats.suspendedUsers}</p>
+              <h4>Pending Suppliers</h4>
+              <p>{stats.pendingSuppliers || 0}</p>
             </div>
 
             <div className="analytics-card">
-              <h4>Pending Verification</h4>
-              <p>{stats.pendingVerification}</p>
+              <h4>Total Orders</h4>
+              <p>{stats.totalOrders || 0}</p>
+            </div>
+
+            <div className="analytics-card">
+              <h4>Revenue (ETB)</h4>
+              <p>{stats.revenue ? stats.revenue.toLocaleString() : 0}</p>
             </div>
           </div>
 
-          {/* Monthly Registrations Chart */}
+          {/* Revenue Trend Chart */}
           <div className="chart-section">
-            <h3>Monthly User Registrations</h3>
+            <h3>Revenue Trend (Last 6 Months)</h3>
             <div className="chart-box">
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={stats.monthlyRegistrations}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#2563eb" />
-                </BarChart>
-              </ResponsiveContainer>
+              {stats.revenueChart && stats.revenueChart.labels && (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart
+                    data={stats.revenueChart.labels.map((label, idx) => ({
+                      month: label,
+                      revenue: stats.revenueChart.values[idx],
+                    }))}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
-          {/* Traffic Chart */}
+          {/* Orders Trend Chart */}
           <div className="chart-section">
-            <h3>Daily Platform Traffic</h3>
+            <h3>Orders Trend (Last 6 Months)</h3>
             <div className="chart-box">
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={stats.dailyTraffic}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="visits" stroke="#10b981" strokeWidth={3} />
-                </LineChart>
-              </ResponsiveContainer>
+              {stats.ordersChart && stats.ordersChart.labels && (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={stats.ordersChart.labels.map((label, idx) => ({
+                      month: label,
+                      orders: stats.ordersChart.values[idx],
+                    }))}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="orders" fill="#2563eb" />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
+
+          {/* Top Suppliers */}
+          {stats.topSuppliers && stats.topSuppliers.length > 0 && (
+            <div className="chart-section">
+              <h3>Top Suppliers (Last 6 Months)</h3>
+              <div className="chart-box">
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={stats.topSuppliers}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="supplierName" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="orderCount" fill="#8b5cf6" name="Orders" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+
+          {/* Top Products */}
+          {stats.topProducts && stats.topProducts.length > 0 && (
+            <div className="chart-section">
+              <h3>Top Products by Quantity (Last 6 Months)</h3>
+              <div className="chart-box">
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={stats.topProducts}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="orderedQty" fill="#f59e0b" name="Ordered Quantity" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
