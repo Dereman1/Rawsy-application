@@ -75,21 +75,21 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="account"
-        options={{
-          title: t('account'),
-          tabBarIcon: ({ color, size, focused }) => (
-            <MaterialIcons name={focused ? "person" : "person-outline"} size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="quotes"
         options={{
           title: t('quotes'),
           href: isSupplier ? undefined : null,
           tabBarIcon: ({ color, size, focused }) => (
             <MaterialIcons name={focused ? "chat-bubble" : "chat-bubble-outline"} size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: t('account'),
+          tabBarIcon: ({ color, size, focused }) => (
+            <MaterialIcons name={focused ? "person" : "person-outline"} size={size} color={color} />
           ),
         }}
       />
