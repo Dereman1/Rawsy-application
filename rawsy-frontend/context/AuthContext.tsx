@@ -1,8 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { authService } from '../services/auth.service';
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
 import api from '../services/api';
 
 interface User {
@@ -18,6 +15,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   loading: boolean;
   login: (emailOrPhone: string, password: string) => Promise<void>;
   register: (data: any) => Promise<void>;
@@ -30,72 +28,44 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
-    try {
-      const token = await authService.getToken();
-      if (token) {
-        const response = await api.get('/auth/me');
-        const currentUser = response.data.profile;
-        setUser(currentUser);
-        await authService.updateStoredUser(currentUser);
-      }
-    } catch (error) {
-      console.error('Error loading user:', error);
-      await authService.clearAuth();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const registerDeviceToken = async () => {
-    try {
-      if (!Device.isDevice) {
-        console.log('Push notifications only work on physical devices');
-        return;
-      }
-
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-
-      if (finalStatus !== 'granted') {
-        console.log('Failed to get push token for notifications');
-        return;
-      }
-
-      let tokenData;
+    const init = async () => {
       try {
-        tokenData = await Notifications.getExpoPushTokenAsync();
-      } catch (err) {
-        console.log('Could not get Expo push token, using device ID as fallback');
-        const deviceId = await Device.osBuildId || 'device-' + Date.now();
-        await api.post('/auth/save-device-token', { deviceToken: deviceId });
-        return;
-      }
+        const storedToken = await authService.getToken();
+        const storedUser = await authService.getCurrentUser();
 
-      const deviceToken = tokenData.data;
-      await api.post('/auth/save-device-token', { deviceToken });
-      console.log('Device token registered:', deviceToken);
-    } catch (error) {
-      console.error('Error registering device token:', error);
-    }
-  };
+        if (storedToken && storedUser) {
+          setToken(storedToken);
+          setUser(storedUser);
+
+          // Optionally refresh user from backend
+          const res = await api.get('/auth/me', {
+            headers: { Authorization: `Bearer ${storedToken}` },
+          });
+          setUser(res.data.profile);
+          await authService.updateStoredUser(res.data.profile);
+        }
+      } catch (error) {
+        console.error('Error loading auth:', error);
+        await authService.clearAuth();
+        setUser(null);
+        setToken(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    init();
+  }, []);
 
   const login = async (emailOrPhone: string, password: string) => {
     try {
-      const { user: loggedInUser } = await authService.login({ emailOrPhone, password });
+      const { user: loggedInUser, token: jwtToken } = await authService.login({ emailOrPhone, password });
       setUser(loggedInUser);
-      await registerDeviceToken();
+      setToken(jwtToken);
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Login failed');
     }
@@ -103,20 +73,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (data: any) => {
     try {
-      const { user: registeredUser } = await authService.register(data);
+      const { user: registeredUser, token: jwtToken } = await authService.register(data);
       setUser(registeredUser);
-      await registerDeviceToken();
+      setToken(jwtToken);
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Registration failed');
     }
   };
 
   const refreshUser = async () => {
+    if (!token) return;
     try {
-      const response = await api.get('/auth/me');
-      const currentUser = response.data.profile;
-      setUser(currentUser);
-      await authService.updateStoredUser(currentUser);
+      const res = await api.get('/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+      setUser(res.data.profile);
+      await authService.updateStoredUser(res.data.profile);
     } catch (error) {
       console.error('Error refreshing user:', error);
     }
@@ -125,9 +95,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       await authService.logout();
+    } finally {
       setUser(null);
-    } catch (error) {
-      console.error('Logout error:', error);
+      setToken(null);
     }
   };
 
@@ -135,6 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
+        token,
         loading,
         login,
         register,
@@ -150,8 +121,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };

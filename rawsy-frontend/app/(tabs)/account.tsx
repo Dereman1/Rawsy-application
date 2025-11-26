@@ -174,7 +174,12 @@ export default function AccountScreen() {
             left={(props) => <List.Icon {...props} icon="information" />}
             right={(props) => <List.Icon {...props} icon="chevron-right" />}
             onPress={() => router.push('/about')}
-
+            />
+          <List.Item
+            title="Change Password" 
+            left={(props) => <List.Icon {...props} icon="lock-reset" />}
+            right={(props) => <List.Icon {...props} icon="chevron-right" />}
+            onPress={() => router.push('/changePassword')}
           />
         </List.Section>
 

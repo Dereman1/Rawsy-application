@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TextInput } from 'react-native';
+import { View, StyleSheet, ScrollView, TextInput as RNTextInput } from 'react-native';
 import { Text, Appbar, List, Surface, useTheme as usePaperTheme } from 'react-native-paper';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useRouter } from 'expo-router';
 
-const FAQS = [
+interface FAQ {
+  question: string;
+  answer: string;
+}
+
+const FAQS: FAQ[] = [
   {
     question: "How do I reset my password?",
     answer: "Go to your profile, tap 'Change Password', and follow the instructions."
@@ -24,13 +29,14 @@ const FAQS = [
   }
 ];
 
-export default function HelpSupportScreen() {
+const HelpSupportScreen: React.FC = () => {
   const { theme } = useTheme();
   const paperTheme = usePaperTheme();
   const { t } = useLanguage();
   const router = useRouter();
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState<string>('');
+
   const filteredFAQs = FAQS.filter(faq =>
     faq.question.toLowerCase().includes(search.toLowerCase())
   );
@@ -45,7 +51,7 @@ export default function HelpSupportScreen() {
       <ScrollView style={styles.content}>
         {/* Search / Question input */}
         <Surface style={[styles.searchContainer, { backgroundColor: paperTheme.colors.surface }]}>
-          <TextInput
+          <RNTextInput
             placeholder={t('askQuestion') ?? "Type your question..."}
             placeholderTextColor={paperTheme.colors.onSurfaceVariant}
             value={search}
@@ -80,7 +86,9 @@ export default function HelpSupportScreen() {
       </ScrollView>
     </View>
   );
-}
+};
+
+export default HelpSupportScreen;
 
 const styles = StyleSheet.create({
   container: {

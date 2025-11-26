@@ -5,7 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useRouter } from 'expo-router';
 
-export default function AboutScreen() {
+const AboutScreen: React.FC = () => {
   const { theme } = useTheme();
   const paperTheme = usePaperTheme();
   const { t } = useLanguage();
@@ -15,7 +15,7 @@ export default function AboutScreen() {
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Appbar.Header elevated>
         <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title={t('about')} />
+        <Appbar.Content title={t('about') ?? 'About'} />
       </Appbar.Header>
 
       <ScrollView style={styles.content}>
@@ -28,7 +28,7 @@ export default function AboutScreen() {
           />
 
           <Text variant="headlineSmall" style={[styles.title, { color: paperTheme.colors.onSurface }]}>
-            {t('aboutAppTitle') ?? "About Rawsy"}
+            {t('aboutAppTitle') ?? 'About Rawsy'}
           </Text>
 
           {/* Description */}
@@ -41,7 +41,7 @@ export default function AboutScreen() {
         {/* Features Section */}
         <Surface style={[styles.card, { backgroundColor: paperTheme.colors.surface }]} elevation={1}>
           <Text variant="titleMedium" style={[styles.sectionTitle, { color: paperTheme.colors.onSurface }]}>
-            {t('keyFeatures') ?? "Key Features"}
+            {t('keyFeatures') ?? 'Key Features'}
           </Text>
 
           <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Fast and secure verification</Text>
@@ -68,7 +68,9 @@ export default function AboutScreen() {
       </ScrollView>
     </View>
   );
-}
+};
+
+export default AboutScreen;
 
 const styles = StyleSheet.create({
   container: {
