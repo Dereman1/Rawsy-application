@@ -296,43 +296,119 @@ function UserManagement() {
                             onClick={() => handleApproveSupplier(user._id)}
                             disabled={actionLoading === user._id}
                             className="btn-approve"
+                            title="Approve supplier account"
                           >
-                            {actionLoading === user._id ? '...' : 'Approve'}
+                            {actionLoading === user._id ? (
+                              <span className="loading-spinner">⏳</span>
+                            ) : (
+                              <>✓ Approve</>
+                            )}
                           </button>
                           <button
                             onClick={() => handleRejectSupplier(user._id)}
                             disabled={actionLoading === user._id}
                             className="btn-reject"
+                            title="Reject supplier application"
                           >
-                            {actionLoading === user._id ? '...' : 'Reject'}
+                            {actionLoading === user._id ? (
+                              <span className="loading-spinner">⏳</span>
+                            ) : (
+                              <>✕ Reject</>
+                            )}
                           </button>
                         </>
                       )}
-                      {user.status === 'suspended' ? (
-                        <button
-                          onClick={() => handleUnsuspendUser(user._id)}
-                          disabled={actionLoading === user._id}
-                          className="btn-unsuspend"
-                        >
-                          {actionLoading === user._id ? '...' : 'Unsuspend'}
-                        </button>
-                      ) : user.status !== 'deactivated' && user.status !== 'pending' && (
-                        <button
-                          onClick={() => handleSuspendUser(user._id)}
-                          disabled={actionLoading === user._id}
-                          className="btn-suspend"
-                        >
-                          {actionLoading === user._id ? '...' : 'Suspend'}
-                        </button>
+
+                      {user.role === 'manufacturer' && user.status !== 'deactivated' && (
+                        <>
+                          {user.status === 'suspended' ? (
+                            <button
+                              onClick={() => handleUnsuspendUser(user._id)}
+                              disabled={actionLoading === user._id}
+                              className="btn-unsuspend"
+                              title="Reactivate manufacturer account"
+                            >
+                              {actionLoading === user._id ? (
+                                <span className="loading-spinner">⏳</span>
+                              ) : (
+                                <>↻ Unsuspend</>
+                              )}
+                            </button>
+                          ) : user.status === 'active' && (
+                            <button
+                              onClick={() => handleSuspendUser(user._id)}
+                              disabled={actionLoading === user._id}
+                              className="btn-suspend"
+                              title="Temporarily suspend manufacturer access"
+                            >
+                              {actionLoading === user._id ? (
+                                <span className="loading-spinner">⏳</span>
+                              ) : (
+                                <>⏸ Suspend</>
+                              )}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDeleteUser(user._id)}
+                            disabled={actionLoading === user._id}
+                            className="btn-delete"
+                            title="Permanently deactivate manufacturer account"
+                          >
+                            {actionLoading === user._id ? (
+                              <span className="loading-spinner">⏳</span>
+                            ) : (
+                              <>🗑 Deactivate</>
+                            )}
+                          </button>
+                        </>
                       )}
-                      {user.status !== 'deactivated' && (
-                        <button
-                          onClick={() => handleDeleteUser(user._id)}
-                          disabled={actionLoading === user._id}
-                          className="btn-delete"
-                        >
-                          {actionLoading === user._id ? '...' : 'Deactivate'}
-                        </button>
+
+                      {user.role === 'supplier' && user.status !== 'pending' && user.status !== 'deactivated' && (
+                        <>
+                          {user.status === 'suspended' ? (
+                            <button
+                              onClick={() => handleUnsuspendUser(user._id)}
+                              disabled={actionLoading === user._id}
+                              className="btn-unsuspend"
+                              title="Reactivate supplier account"
+                            >
+                              {actionLoading === user._id ? (
+                                <span className="loading-spinner">⏳</span>
+                              ) : (
+                                <>↻ Unsuspend</>
+                              )}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleSuspendUser(user._id)}
+                              disabled={actionLoading === user._id}
+                              className="btn-suspend"
+                              title="Temporarily suspend supplier access"
+                            >
+                              {actionLoading === user._id ? (
+                                <span className="loading-spinner">⏳</span>
+                              ) : (
+                                <>⏸ Suspend</>
+                              )}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDeleteUser(user._id)}
+                            disabled={actionLoading === user._id}
+                            className="btn-delete"
+                            title="Permanently deactivate supplier account"
+                          >
+                            {actionLoading === user._id ? (
+                              <span className="loading-spinner">⏳</span>
+                            ) : (
+                              <>🗑 Deactivate</>
+                            )}
+                          </button>
+                        </>
+                      )}
+
+                      {user.status === 'deactivated' && (
+                        <span className="deactivated-label">Account Deactivated</span>
                       )}
                     </div>
                   </td>
