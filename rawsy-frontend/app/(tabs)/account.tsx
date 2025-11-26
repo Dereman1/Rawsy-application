@@ -139,13 +139,6 @@ export default function AccountScreen() {
                 right={(props) => <List.Icon {...props} icon="chevron-right" />}
                 onPress={() => router.push('/orders')}
               />
-              <List.Item
-                title={t('wishlist')}
-                description="View saved products"
-                left={(props) => <List.Icon {...props} icon="heart" />}
-                right={(props) => <List.Icon {...props} icon="chevron-right" />}
-                onPress={() => {}}
-              />
             </>
           )}
           {user?.role === 'supplier' && (
@@ -174,13 +167,14 @@ export default function AccountScreen() {
             title={t('helpSupport')}
             left={(props) => <List.Icon {...props} icon="help-circle" />}
             right={(props) => <List.Icon {...props} icon="chevron-right" />}
-            onPress={() => {}}
+            onPress={() => router.push('/help-support')}
           />
           <List.Item
             title={t('about')}
             left={(props) => <List.Icon {...props} icon="information" />}
             right={(props) => <List.Icon {...props} icon="chevron-right" />}
-            onPress={() => {}}
+            onPress={() => router.push('/about')}
+
           />
         </List.Section>
 
