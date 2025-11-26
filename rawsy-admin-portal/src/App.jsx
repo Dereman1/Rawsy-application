@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import UserManagement from './components/UserManagement';
 import ProductModeration from './components/ProductModeration';
+import PlatformAnalytics from './components/platformAnalytics';
+// CSS import is correct here!
 import './App.css';
 
 function App() {
@@ -18,6 +20,7 @@ function App() {
       setIsAuthenticated(true);
       setAdminUser(JSON.parse(user));
     }
+
     setLoading(false);
   }, []);
 
@@ -44,21 +47,21 @@ function App() {
     );
   }
 
-  if (!isAuthenticated) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
-  }
+  if (!isAuthenticated) return <Login onLoginSuccess={handleLoginSuccess} />;
 
   return (
     <div className="app">
       <header className="app-header">
         <h1>Rawsy Admin Portal</h1>
+
         <div className="header-actions">
           <span className="user-info">Welcome, {adminUser?.name}</span>
-          <button onClick={handleLogout} className="logout-button">
+          <button className="logout-button" onClick={handleLogout}>
             Logout
           </button>
         </div>
       </header>
+
       <nav className="app-nav">
         <button
           className={`nav-tab ${activeTab === 'users' ? 'active' : ''}`}
@@ -66,16 +69,25 @@ function App() {
         >
           User Management
         </button>
+
         <button
           className={`nav-tab ${activeTab === 'products' ? 'active' : ''}`}
           onClick={() => setActiveTab('products')}
         >
           Product Moderation
         </button>
+        <button
+          className={`nav-tab ${activeTab === 'analytics' ? 'active' : ''}`}
+          onClick={() => setActiveTab('analytics')}
+        >
+          Platform Analytics
+        </button>
       </nav>
+
       <main className="app-main">
         {activeTab === 'users' && <UserManagement />}
         {activeTab === 'products' && <ProductModeration />}
+        {activeTab === 'analytics' && <PlatformAnalytics />}
       </main>
     </div>
   );

@@ -1,9 +1,11 @@
+/* Layout */
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
+/* HEADER */
 .app-header {
   background-color: #2563eb;
   color: white;
@@ -39,30 +41,30 @@
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: 0.2s;
 }
 
 .logout-button:hover {
   background-color: rgba(255, 255, 255, 0.3);
 }
 
+/* NAVIGATION */
 .app-nav {
   background-color: #f3f4f6;
   border-bottom: 2px solid #e5e7eb;
   display: flex;
-  gap: 0;
 }
 
 .nav-tab {
   flex: 1;
   padding: 1rem 1.5rem;
-  background-color: transparent;
+  background: transparent;
   color: #6b7280;
   border: none;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: 0.2s;
   border-bottom: 3px solid transparent;
   text-align: left;
 }
@@ -78,11 +80,13 @@
   background-color: white;
 }
 
+/* MAIN SECTION */
 .app-main {
   flex: 1;
   padding: 2rem;
 }
 
+/* WELCOME BOX */
 .welcome-section {
   background: white;
   padding: 3rem;
