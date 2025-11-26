@@ -33,8 +33,10 @@ const AboutScreen: React.FC = () => {
 
           {/* Description */}
           <Text variant="bodyMedium" style={[styles.description, { color: paperTheme.colors.onSurfaceVariant }]}>
-            Rawsy is a secure verification platform designed to simplify
-            document authentication and identity validation with speed and reliability.
+            Rawsy is a comprehensive B2B marketplace connecting manufacturers with verified
+            raw material suppliers across Ethiopia. Our platform streamlines procurement,
+            ensures supplier authenticity, and facilitates seamless transactions with
+            built-in quality assurance and transparent pricing.
           </Text>
         </Surface>
 
@@ -44,20 +46,39 @@ const AboutScreen: React.FC = () => {
             {t('keyFeatures') ?? 'Key Features'}
           </Text>
 
-          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Fast and secure verification</Text>
-          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Cloud-based file storage</Text>
-          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Real-time validation</Text>
-          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Smooth user experience</Text>
+          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Verified Supplier Network - Access to pre-screened and authenticated raw material suppliers</Text>
+          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Quote Management System - Request, negotiate, and manage custom quotes seamlessly</Text>
+          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Order Tracking - Real-time visibility into your order status from placement to delivery</Text>
+          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Secure Payment Processing - Multiple payment methods with transaction security and proof management</Text>
+          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Product Catalog - Comprehensive listings of raw materials with detailed specifications</Text>
+          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Multi-Language Support - Available in English, Amharic, and Afaan Oromo for local accessibility</Text>
         </Surface>
 
-        {/* Developer Section */}
+        {/* Technology Stack Section */}
         <Surface style={[styles.card, { backgroundColor: paperTheme.colors.surface }]} elevation={1}>
           <Text variant="titleMedium" style={[styles.sectionTitle, { color: paperTheme.colors.onSurface }]}>
-            Developer
+            Technology Stack
           </Text>
 
           <Text style={[styles.description, { color: paperTheme.colors.onSurfaceVariant }]}>
-            Developed by Dere using React Native, Node.js and modern cloud technologies.
+            Built with enterprise-grade technologies for reliability and scalability:
+          </Text>
+
+          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• React Native & Expo - Cross-platform mobile development framework</Text>
+          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Node.js & Express - High-performance backend infrastructure</Text>
+          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• MongoDB - Scalable NoSQL database for efficient data management</Text>
+          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Cloudinary - Cloud-based media storage and optimization</Text>
+          <Text style={[styles.listItem, { color: paperTheme.colors.onSurfaceVariant }]}>• Firebase - Real-time notifications and authentication services</Text>
+        </Surface>
+
+        {/* Contact & Support Section */}
+        <Surface style={[styles.card, { backgroundColor: paperTheme.colors.surface }]} elevation={1}>
+          <Text variant="titleMedium" style={[styles.sectionTitle, { color: paperTheme.colors.onSurface }]}>
+            Contact & Support
+          </Text>
+
+          <Text style={[styles.description, { color: paperTheme.colors.onSurfaceVariant }]}>
+            For inquiries, support, or partnership opportunities, please reach out through our Help & Support center or contact our team directly.
           </Text>
         </Surface>
 
