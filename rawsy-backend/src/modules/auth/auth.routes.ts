@@ -3,6 +3,7 @@ import {
   register,
   login,
   listManufacturers,
+  listAllUsers,
   suspendManufacturer,
   deleteManufacturer,
   unsuspendManufacturer,
@@ -29,6 +30,7 @@ router.post("/login", login);
 
 // ---------------- ADMIN MANUFACTURER MANAGEMENT ----------------
 router.get("/manufacturers", authenticate, requireAdmin, listManufacturers);
+router.get("/users", authenticate, requireAdmin, listAllUsers);
 
 router.put("/manufacturer/:id/suspend", authenticate, requireAdmin, suspendManufacturer);
 router.put("/manufacturer/:id/unsuspend", authenticate, requireAdmin, unsuspendManufacturer);

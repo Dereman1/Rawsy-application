@@ -18,7 +18,7 @@ function UserManagement() {
       setError('');
       const token = localStorage.getItem('authToken');
 
-      const response = await fetch('http://localhost:4000/api/auth/manufacturers', {
+      const response = await fetch('http://localhost:4000/api/auth/users', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -29,7 +29,7 @@ function UserManagement() {
       }
 
       const data = await response.json();
-      setUsers(data.manufacturers || []);
+      setUsers(data.users || []);
     } catch (err) {
       setError(err.message);
     } finally {

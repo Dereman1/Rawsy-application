@@ -45,6 +45,22 @@ export const listManufacturers = async (req: Request, res: Response) => {
   }
 };
 
+// ---------------- ADMIN: LIST ALL USERS (MANUFACTURERS & SUPPLIERS) ----------------
+export const listAllUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await User.find({
+      role: { $in: ["manufacturer", "supplier"] }
+    }).select("-password").sort({ createdAt: -1 });
+
+    return res.json({
+      count: users.length,
+      users,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to fetch users" });
+  }
+};
+
 // ---------------- ADMIN: SUSPEND MANUFACTURER ----------------
 export const suspendManufacturer = async (req: Request, res: Response) => {
   try {
