@@ -23,7 +23,7 @@ function ProductModeration() {
       setError('');
       const token = localStorage.getItem('authToken');
 
-      const response = await fetch('http://localhost:4000/api/products', {
+      const response = await fetch('http://localhost:4000/api/products/admin/all', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -48,7 +48,7 @@ function ProductModeration() {
       setActionLoading(productId);
       const token = localStorage.getItem('authToken');
 
-      const response = await fetch(`http://localhost:4000/api/admin/products/${productId}/review`, {
+      const response = await fetch(`http://localhost:4000/api/products/admin/all/${productId}/review`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -79,7 +79,7 @@ function ProductModeration() {
       setActionLoading(productId);
       const token = localStorage.getItem('authToken');
 
-      const response = await fetch(`http://localhost:4000/api/admin/products/${productId}/review`, {
+      const response = await fetch(`http://localhost:4000/api/products/admin/all/${productId}/review`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -107,7 +107,7 @@ function ProductModeration() {
       setActionLoading(productId);
       const token = localStorage.getItem('authToken');
 
-      const response = await fetch(`http://localhost:4000/api/admin/products/${productId}/flag`, {
+      const response = await fetch(`http://localhost:4000/api/products/admin/all/${productId}/flag`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

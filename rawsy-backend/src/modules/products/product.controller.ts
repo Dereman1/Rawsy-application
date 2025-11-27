@@ -80,7 +80,79 @@ export const getAllProducts = async (req: Request, res: Response) => {
     return res.status(500).json({ error: err.message });
   }
 };
+export const getAllProductsForAdmin = async (req: Request, res: Response) => {
+  try {
+    const products = await Product.find({})
+      .populate("supplier", "name companyName phone averageRating verifiedSupplier")
+      .sort({ createdAt: -1 });
 
+    return res.json(products);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+export const flagProduct = async (req: Request, res: Response) => {
+  try {
+    const { productId } = req.params as { productId: string };
+
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    product.flagged = true;
+    await product.save();
+
+    res.json({ message: "Product flagged", product });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+// ✅ Unflag a product (admin only)
+export const unflagProduct = async (req: Request, res: Response) => {
+  try {
+    const { productId } = req.params;
+
+    // Find the product
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Unflag it
+    product.flagged = false;
+    await product.save();
+
+    return res.json({
+      message: "Product unflagged successfully",
+      product,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+export const reviewProduct = async (req :Request, res:Response) => {
+  try {
+    const { action, reason } = req.body;
+    const { productId } = req.params;
+
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    if (action === "approve") {
+      product.status = "approved";
+      product.rejectionReason = null as any;
+    } else if (action === "reject") {
+      product.status = "rejected";
+      product.rejectionReason = reason || "No reason provided";
+    }
+
+    await product.save();
+    res.json({ message: "Product updated", product });
+
+  } catch (err : any) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 /**
  * ================================

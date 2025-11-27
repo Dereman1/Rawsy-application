@@ -13,7 +13,7 @@ const ProductSchema = new Schema(
     category: { type: String, required: true },
 
     price: { type: Number, required: true },
-    unit: { type: String, required: true }, 
+    unit: { type: String, required: true },
     stock: { type: Number, required: true },
 
     // 💰 Discount
@@ -31,7 +31,7 @@ const ProductSchema = new Schema(
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
-      default: "pending"      
+      default: "pending"
     },
     rejectionReason: { type: String, default: null },
 
@@ -41,7 +41,20 @@ const ProductSchema = new Schema(
       count: { type: Number, default: 0 }
     },
 
-    negotiable: { type: Boolean, default: false }
+    negotiable: { type: Boolean, default: false },
+
+    // 🚩 FLAG SYSTEM
+    flagged: { type: Boolean, default: false },               // Yes/No
+    flagReason: { type: String, default: null },              // Main reason
+    flaggedBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
+    flagCount: { type: Number, default: 0 },                  // Count total flags
+    flags: [
+      {
+        reason: String,
+        date: { type: Date, default: Date.now },
+        user: { type: Schema.Types.ObjectId, ref: "User" }
+      }
+    ]
   },
   { timestamps: true }
 );
