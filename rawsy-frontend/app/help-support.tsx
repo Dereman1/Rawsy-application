@@ -36,23 +36,16 @@ const HelpSupportScreen: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState('faq');
   const [search, setSearch] = useState<string>('');
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [faqs, setFaqs] = useState<FAQ[]>([]);;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
-  const [selectedFile, setSelectedFile] = useState<any>(null);
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (activeTab === 'faq') {
       fetchFAQs();
-    } else {
-      fetchTickets();
-    }
+    } 
   }, [activeTab]);
 
   const fetchFAQs = async () => {
@@ -69,84 +62,18 @@ const HelpSupportScreen: React.FC = () => {
     }
   };
 
-  const fetchTickets = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('/support/ticket/mine');
-      setTickets(response.data.tickets || []);
-      setError('');
-    } catch (err) {
-      console.error('Error fetching tickets:', err);
-      setError('Failed to load tickets');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  
   const onRefresh = async () => {
     setRefreshing(true);
     if (activeTab === 'faq') {
       await fetchFAQs();
-    } else {
-      await fetchTickets();
-    }
+    } 
     setRefreshing(false);
   };
 
-  const pickDocument = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ['image/*', 'application/pdf'],
-        copyToCacheDirectory: true,
-      });
+  
 
-      if (!result.canceled && result.assets[0]) {
-        setSelectedFile(result.assets[0]);
-      }
-    } catch (error) {
-      console.error('Error picking document:', error);
-      Alert.alert('Error', 'Failed to pick document');
-    }
-  };
-
-  const handleSubmitTicket = async () => {
-    if (!subject.trim() || !message.trim()) {
-      Alert.alert('Error', 'Please provide both subject and message');
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      const formData = new FormData();
-      formData.append('subject', subject.trim());
-      formData.append('message', message.trim());
-
-      if (selectedFile) {
-        const fileToUpload: any = {
-          uri: selectedFile.uri,
-          type: selectedFile.mimeType || 'application/octet-stream',
-          name: selectedFile.name,
-        };
-        formData.append('attachment', fileToUpload);
-      }
-
-      await api.post('/support/ticket', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
-      Alert.alert('Success', 'Your support ticket has been submitted successfully');
-      setSubject('');
-      setMessage('');
-      setSelectedFile(null);
-      await fetchTickets();
-    } catch (err: any) {
-      console.error('Error submitting ticket:', err);
-      Alert.alert('Error', err.response?.data?.error || 'Failed to submit ticket');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
+ 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open':
@@ -259,178 +186,11 @@ const HelpSupportScreen: React.FC = () => {
           </>
         ) : (
           <>
-            <Surface style={[styles.createTicketCard, { backgroundColor: paperTheme.colors.surface }]} elevation={2}>
-              <Text variant="titleMedium" style={styles.cardTitle}>
-                Create Support Ticket
+            <Surface style={[styles.emptyContainer, { backgroundColor: paperTheme.colors.surface }]}>
+              <Text style={{ color: paperTheme.colors.onSurfaceVariant }}>
+                {t('noTickets') ?? "No support tickets to display."}
               </Text>
-
-              <TextInput
-                label="Subject *"
-                value={subject}
-                onChangeText={setSubject}
-                mode="outlined"
-                style={styles.input}
-                disabled={submitting}
-              />
-
-              <TextInput
-                label="Message *"
-                value={message}
-                onChangeText={setMessage}
-                mode="outlined"
-                multiline
-                numberOfLines={6}
-                style={styles.input}
-                disabled={submitting}
-              />
-
-              <View style={styles.attachmentSection}>
-                <Button
-                  mode="outlined"
-                  icon="paperclip"
-                  onPress={pickDocument}
-                  disabled={submitting}
-                  style={styles.attachButton}
-                >
-                  {selectedFile ? 'Change Attachment' : 'Attach File (Optional)'}
-                </Button>
-                {selectedFile && (
-                  <View style={styles.fileInfo}>
-                    <MaterialIcons name="insert-drive-file" size={20} color={paperTheme.colors.primary} />
-                    <Text variant="bodySmall" style={styles.fileName}>
-                      {selectedFile.name}
-                    </Text>
-                    <MaterialIcons
-                      name="close"
-                      size={20}
-                      color={paperTheme.colors.error}
-                      onPress={() => setSelectedFile(null)}
-                    />
-                  </View>
-                )}
-              </View>
-
-              <Button
-                mode="contained"
-                onPress={handleSubmitTicket}
-                loading={submitting}
-                disabled={submitting}
-                icon="send"
-                style={styles.submitButton}
-              >
-                Submit Ticket
-              </Button>
             </Surface>
-
-            <Text variant="titleMedium" style={styles.sectionTitle}>
-              My Support Tickets
-            </Text>
-
-            {loading && (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={paperTheme.colors.primary} />
-                <Text style={{ color: paperTheme.colors.onSurfaceVariant, marginTop: 12 }}>
-                  Loading tickets...
-                </Text>
-              </View>
-            )}
-
-            {error && !loading && (
-              <Surface style={[styles.errorContainer, { backgroundColor: paperTheme.colors.errorContainer }]}>
-                <Text style={{ color: paperTheme.colors.error, padding: 16 }}>
-                  {error}
-                </Text>
-              </Surface>
-            )}
-
-            {!loading && !error && tickets.length === 0 && (
-              <View style={styles.emptyContainer}>
-                <MaterialIcons name="confirmation-number" size={64} color={paperTheme.colors.onSurfaceVariant} />
-                <Text style={{ color: paperTheme.colors.onSurfaceVariant, marginTop: 12 }}>
-                  No support tickets yet
-                </Text>
-              </View>
-            )}
-
-            {!loading && !error && tickets.length > 0 && (
-              <View style={styles.ticketsList}>
-                {tickets.map((ticket) => (
-                  <Card key={ticket._id} style={styles.ticketCard}>
-                    <Card.Content>
-                      <View style={styles.ticketHeader}>
-                        <Text variant="titleMedium" style={styles.ticketSubject}>
-                          {ticket.subject}
-                        </Text>
-                        <Chip
-                          style={{ backgroundColor: getStatusColor(ticket.status) }}
-                          textStyle={{ color: '#fff', fontSize: 11 }}
-                        >
-                          {getStatusLabel(ticket.status)}
-                        </Chip>
-                      </View>
-
-                      <Text variant="bodySmall" style={[styles.ticketDate, { color: paperTheme.colors.onSurfaceVariant }]}>
-                        {new Date(ticket.createdAt).toLocaleDateString()} at {new Date(ticket.createdAt).toLocaleTimeString()}
-                      </Text>
-
-                      <Divider style={styles.ticketDivider} />
-
-                      <Text variant="bodyMedium" style={styles.ticketMessage}>
-                        {ticket.message}
-                      </Text>
-
-                      {ticket.attachments && ticket.attachments.length > 0 && (
-                        <View style={styles.attachmentsSection}>
-                          <Text variant="labelSmall" style={{ color: paperTheme.colors.onSurfaceVariant, marginBottom: 4 }}>
-                            Attachments:
-                          </Text>
-                          {ticket.attachments.map((att, idx) => (
-                            <View key={idx} style={styles.attachmentItem}>
-                              <MaterialIcons name="insert-drive-file" size={16} color={paperTheme.colors.primary} />
-                              <Text variant="bodySmall" style={{ marginLeft: 4 }}>
-                                {att.filename}
-                              </Text>
-                            </View>
-                          ))}
-                        </View>
-                      )}
-
-                      {ticket.adminReply && (
-                        <Surface style={[styles.adminReplyBox, { backgroundColor: paperTheme.colors.primaryContainer }]} elevation={0}>
-                          <View style={styles.adminReplyHeader}>
-                            <MaterialIcons name="support-agent" size={18} color={paperTheme.colors.primary} />
-                            <Text variant="labelMedium" style={{ color: paperTheme.colors.primary, marginLeft: 6 }}>
-                              Admin Reply
-                            </Text>
-                          </View>
-                          <Text variant="bodyMedium" style={[styles.adminReplyText, { color: paperTheme.colors.onPrimaryContainer }]}>
-                            {ticket.adminReply}
-                          </Text>
-                          {ticket.adminAttachments && ticket.adminAttachments.length > 0 && (
-                            <View style={styles.attachmentsSection}>
-                              {ticket.adminAttachments.map((att, idx) => (
-                                <View key={idx} style={styles.attachmentItem}>
-                                  <MaterialIcons name="insert-drive-file" size={16} color={paperTheme.colors.primary} />
-                                  <Text variant="bodySmall" style={{ marginLeft: 4 }}>
-                                    {att.filename}
-                                  </Text>
-                                </View>
-                              ))}
-                            </View>
-                          )}
-                        </Surface>
-                      )}
-
-                      {ticket.resolvedAt && (
-                        <Text variant="bodySmall" style={[styles.resolvedText, { color: '#10b981' }]}>
-                          Resolved on {new Date(ticket.resolvedAt).toLocaleDateString()}
-                        </Text>
-                      )}
-                    </Card.Content>
-                  </Card>
-                ))}
-              </View>
-            )}
           </>
         )}
       </ScrollView>
@@ -476,11 +236,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16,
   },
-  createTicketCard: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 24,
-  },
+  
   cardTitle: {
     fontWeight: 'bold',
     marginBottom: 16,
@@ -488,9 +244,7 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 12,
   },
-  attachmentSection: {
-    marginBottom: 16,
-  },
+  
   attachButton: {
     marginBottom: 8,
   },
